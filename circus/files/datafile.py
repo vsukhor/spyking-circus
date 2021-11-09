@@ -418,8 +418,8 @@ class DataFile(object):
 
     def _get_t_start_t_stop(self, idx, chunk_size, padding=(0, 0)):
 
-        t_start = max(0, idx * numpy.int64(chunk_size) + padding[0])
-        t_stop = min(self.duration, (idx + 1) * numpy.int64(chunk_size) + padding[1])
+        t_start = max(0, idx * numpy.int64(chunk_size) + numpy.int64(padding[0]))
+        t_stop = min(numpy.int64(self.duration), (idx + 1) * numpy.int64(chunk_size) + numpy.int64(padding[1]))
 
         return t_start, t_stop
 
@@ -537,7 +537,7 @@ class DataFile(object):
             duration = 0
             for source in self._sources:
                 duration += source.duration
-            return duration
+            return numpy.int64(duration)
         else:
             return numpy.int64(self._shape[0])
 
