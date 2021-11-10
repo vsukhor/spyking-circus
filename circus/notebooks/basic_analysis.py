@@ -1,4 +1,5 @@
-"""Display the basic spike-derived metrics."""
+"""Extracts and displays some basic spike-derived metrics.
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
