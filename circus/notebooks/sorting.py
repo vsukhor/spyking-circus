@@ -14,32 +14,6 @@ filename_raw = \
 figure_width = 15
 
 
-def load_params(datafile):
-    """ Load parameters."""
-
-    pars = CircusParser(datafile)
-    _ = pars.get_data_file()
-
-    return pars
-
-
-def import_raw_data(filename):
-
-    params = load_params(filename)
-
-    datafile = params.data_file
-    N_e = params.getint('data', 'N_e')
-    N_total = params.nb_channels
-    N_t = params.getint('detection', 'N_t')
-    _, positions = get_nodes_and_positions(params)
-    nodes, edges = get_nodes_and_edges(params)
-    inv_nodes = np.zeros(N_total, dtype=np.int32)
-    inv_nodes[nodes] = np.arange(len(nodes))
-    datafile.open()
-
-    return datafile
-
-
 def check_time_args(t_start, t_stop):
 
     wav = "Wrong argument value:"

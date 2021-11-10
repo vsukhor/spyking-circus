@@ -8,6 +8,8 @@ from circus.shared.parser import CircusParser
 
 
 def set_template_ids(template_id, results):
+    """Preprocesses template ids.
+    """
 
     template_ids = template_id if template_id is not None \
         else np.sort([int(k.split('_')[1])
@@ -31,7 +33,8 @@ def extract_time_data(filename,
     template_ids = set_template_ids(template_id, results)
 
     spike_times = \
-        [results['spiketimes'][f'temp_{tid}'] / sampling_rate for tid in template_ids]
+        [results['spiketimes'][f'temp_{tid}'] / sampling_rate
+         for tid in template_ids]
 
     spike_intervals = \
         [np.diff(st) * 1e+3 for st in spike_times]
@@ -44,7 +47,7 @@ def show_isi(filename,
              template_id,
              maximum_interval=50.0,
              bin_size=1.0):
-    """Display the distribution of Inter-Spike Intervals.
+    """Displays the distribution of inter-spike intervals.
     """
 
     template_ids, \
@@ -85,14 +88,12 @@ def show_isi(filename,
 def extract_amplitude_data(filename,
                            template_id,
                            extension=None):
+    """Extracts template amplitudes from the results file.
+       Returns them classified by template index and accumulated.
+    """
 
-    # Load parameters.
     params = CircusParser(filename)
     _ = params.get_data_file()
-    sampling_rate = params.rate
-    duration = params.data_file.duration
-
-    # Load amplitudes over time.
     extension = "" if extension is None \
         else "-" + extension
     results = load_data(params, 'results', extension=extension)
@@ -103,9 +104,13 @@ def extract_amplitude_data(filename,
 
     return ampl, ampl_total
 
+
 def show_amplitudes(filename,
                     template_id,
                     extension=None):
+    """Displays amplitudes vs time.
+       If template_id is None, all available templates are shown.
+    """
 
     template_ids, \
     spike_times, \
@@ -115,7 +120,6 @@ def show_amplitudes(filename,
     amplitudes, _ = extract_amplitude_data(filename,
                                            template_id,
                                            extension)
-    # Display amplitudes over time.
     fig = plt.figure(figsize=[12, 9])
     ax = plt.subplot(1, 1, 1)
     scatter_kwargs = {
@@ -147,7 +151,8 @@ def show_amplitude_hist(filename,
                         template_id,
                         extension=None,
                         bin_size=0.1):
-    """Display the distribution of Spike maplitudes.
+    """Displays the distribution of spike amplitudes as a histogram.
+       If template_id is None, all available templates are used.
     """
 
     ampl, ampl_total = extract_amplitude_data(filename,
