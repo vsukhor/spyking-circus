@@ -15,6 +15,8 @@ figure_width = 15
 
 
 def check_time_args(t_start, t_stop):
+    """Checks for 't_start', 't_stop' values.
+    """
 
     wav = "Wrong argument value:"
     assert t_start >= 0., \
@@ -24,25 +26,29 @@ def check_time_args(t_start, t_stop):
 
 
 def check_electrode_arg(electrodes, N_e):
+    """Checks for correctness of electrode indexes.
+    """
 
-        wav = "Wrong argument value:"
-        if np.iterable(electrodes):
-            assert len(electrodes), \
-                f"{wav}  Please set the electrodes you are interested in."
-            assert min(electrodes) >= 0, \
-                "Electrodes should be indexed with nonnegative integers."
-        else:
-            assert electrodes >= 0, \
-                "Electrodes should be indexed with nonnegative integers."
-            electrodes = [electrodes]
+    wav = "Wrong argument value:"
+    if np.iterable(electrodes):
+        assert len(electrodes), \
+            f"{wav}  Please set the electrodes you are interested in."
+        assert min(electrodes) >= 0, \
+            "Electrodes should be indexed with nonnegative integers."
+    else:
+        assert electrodes >= 0, \
+            "Electrodes should be indexed with nonnegative integers."
+        electrodes = [electrodes]
 
-        assert max(electrodes) < N_e, \
-              f"{wav}  The data analized used only {N_e} electrodes."
+    assert max(electrodes) < N_e, \
+        f"{wav}  The data analized used only {N_e} electrodes."
 
-        return electrodes
+    return electrodes
 
 
 def plot_peaks(file_name, t_start, t_stop, electrodes):
+    """Shows putative peaks along with the original data in time domain.
+    """
 
     check_time_args(t_start, t_stop)
 
@@ -83,6 +89,7 @@ def plot_peaks(file_name, t_start, t_stop, electrodes):
     idx = electrodes
     n_elec = len(idx)
 
+    print(f"Horisontal dotted lines: signal threscholds.")
     print(f"Spike instances are higlighted with red triangles.")
 
     plt.figure(figsize=[figure_width, n_elec*3])
@@ -109,11 +116,14 @@ def plot_peaks(file_name, t_start, t_stop, electrodes):
         plt.plot([xmin, xmax],
                  [thresholds[i], thresholds[i]], lw=0.15, ls='--', c='b')
         plt.title(f'Electrode {i}: detected {len(peaks[i])} spikes.')
+
     plt.tight_layout()
     plt.show()
 
 
 def plot_fits(file_name, t_start, t_stop, electrodes, templates=None):
+    """Shows reconstructed signal and the original data in time domain.
+    """
 
     check_time_args(t_start, t_stop)
 
@@ -171,7 +181,9 @@ def plot_fits(file_name, t_start, t_stop, electrodes, templates=None):
                                        result['amplitudes'][key][idx]):
             spike -= np.int64(t_start * sampling_rate)
             tmp1 = templates[:, elec].toarray().reshape(N_e, N_t)
-            tmp2 = templates[:, elec+templates.shape[1] // 2].toarray().reshape(N_e, N_t)
+            tmp2 = templates[:, elec+templates.shape[1] // 2]\
+                .toarray()\
+                .reshape(N_e, N_t)
 
             curve[:, spike - template_shift:
                      spike + template_shift + 1] += amp1 * tmp1 + amp2 * tmp2
@@ -204,13 +216,16 @@ def plot_fits(file_name, t_start, t_stop, electrodes, templates=None):
         plt.plot([xmin, xmax],
                  [thresholds[i], thresholds[i]], lw=0.15, ls='--', c='b')
         plt.title(f'Electrode {i}')
+
     plt.tight_layout()
     plt.show()
 
 
-def show_image(filename_raw, electrode):
+def show_image(file_name, electrode):
+    """Displays images generated at the clustering stage.
+    """
 
-    raw = Path(filename_raw)
+    raw = Path(file_name)
     imfile = raw.parent / raw.stem / raw.stem / \
              'plots' / f'cluster_neg_{electrode}.png'
     img = mpimg.imread(imfile)
