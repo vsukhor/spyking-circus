@@ -249,27 +249,13 @@ def show_image(filename_raw, electrode):
 
 def main():
 
-#    plot_spikes_times()
-    import circus.shared.plot as shplot
-#    shplot.view_templates(filename_raw, temp_id=30, best_elec=None, templates=None)
-
-#   from circus import launch as launch
-
-#    launch("whitening", filename_raw, nb_cpu=2, nb_gpu=0, use_gpu=False)
-#    shplot.view_waveforms(filename_raw, temp_id=30, n_spikes=2000)
-
-#    shplot.view_fit(filename_raw, t_start=0, t_stop=0.3, n_elec=[121], fit_on=True, square=False, templates=None, save=False)
-#    plot_fits(filename_raw, t_start=1., t_stop=2., electrodes=[121, 163])
+    plot_fits(filename_raw, t_start=1., t_stop=2., electrodes=[121, 163])
     plot_peaks(filename_raw, t_start=1., t_stop=2., electrodes=[121, 163])
-#    show_image(filename_raw, 163)
 
 
 ########################################################################
 if __name__ == '__main__':
 
-#    data_file = import_raw_data()
-#    data_filtered = data_file.data.reshape(data_file.shape)
-#    plot_time(data_filtered, 3)
     main()
 
     print('')
