@@ -8,6 +8,16 @@ from circus.shared.files import load_data
 from circus.shared.parser import CircusParser
 
 
+def load_parameters(filename):
+    """ Loads parameters.
+    """
+
+    params = CircusParser(filename)
+    _ = params.get_data_file()
+
+    return params
+
+
 def set_template_ids(template_id, results):
     """Preprocesses template ids.
     """
@@ -21,27 +31,35 @@ def set_template_ids(template_id, results):
     return template_ids
 
 
+def spike_times(results, params, template_ids):
+
+    return [results['spiketimes'][f'temp_{tid}'] / params.rate
+            for tid in template_ids]
+
+
+def spike_intervals(spiketimes):
+
+    return [np.diff(st) * 1e+3 for st in spiketimes]
+
+
+def amplitudes(results, template_ids):
+
+    return [results['amplitudes'][f'temp_{tid}'][:, 0]
+            for tid in template_ids]
+
+
 def extract_time_data(filename,
                       template_id=None):
 
-    # Load parameters.
-    params = CircusParser(filename)
-    _ = params.get_data_file()
-    sampling_rate = params.rate
-
-    # Load spike intervals.
+    params = load_parameters(filename)
     results = load_data(params, 'results')
     template_ids = set_template_ids(template_id, results)
 
-    spike_times = \
-        [results['spiketimes'][f'temp_{tid}'] / sampling_rate
-         for tid in template_ids]
+    spiketimes = spike_times(results, params, template_ids)
+    spikeintervals = spike_intervals(spiketimes)
+    spint_total = np.concatenate(spikeintervals, axis=0)
 
-    spike_intervals = \
-        [np.diff(st) * 1e+3 for st in spike_times]
-    spint_total = np.concatenate(spike_intervals, axis=0)
-
-    return template_ids, spike_times, spike_intervals, spint_total
+    return template_ids, spiketimes, spikeintervals, spint_total
 
 
 def show_isi(filename,
@@ -93,14 +111,13 @@ def extract_amplitude_data(filename,
        Returns them classified by template index and accumulated.
     """
 
-    params = CircusParser(filename)
-    _ = params.get_data_file()
+    params = load_parameters(filename)
     extension = "" if extension is None \
         else "-" + extension
     results = load_data(params, 'results', extension=extension)
     template_ids = set_template_ids(template_id, results)
 
-    ampl = [results['amplitudes'][f'temp_{tid}'][:, 0] for tid in template_ids]
+    ampl = amplitudes(results, template_ids)
     ampl_total = np.concatenate(ampl, axis=0)
 
     return ampl, ampl_total
