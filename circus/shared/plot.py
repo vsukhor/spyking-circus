@@ -81,7 +81,7 @@ def view_fit(file_name, t_start=0, t_stop=1, n_elec=2, fit_on=True, square=True,
             idx = numpy.random.permutation(numpy.arange(N_e))[:n_elec]
     else:
         idx = n_elec
-        n_elec = numpy.sqrt(len(idx))
+        n_elec = len(idx)
     pylab.figure()
     for count, i in enumerate(idx):
         if square:
@@ -901,7 +901,7 @@ def view_isolated_waveforms(file_name, t_start=0, t_stop=1):
     for electrode in range(N_e):
         for i in range(len(peaks[electrode])):
             peak_time = peaks[electrode][i]
-            if peak_time > N_t / 2:
+            if data.shape[0] - N_t / 2 > peak_time > N_t / 2:
                 k_start = peak_time - (N_t - 1) // 2
                 k_stop = peak_time + (N_t - 1) // 2 + 1
                 curve[count] = data[k_start:k_stop, electrode]
@@ -1241,8 +1241,8 @@ def view_peaks(file_name, t_start=0, t_stop=1, n_elec=2, square=True, xzoom=None
     spike_thresh = params.getfloat('detection', 'spike_thresh')
     file_out_suff = params.get('data', 'file_out_suff')
     nodes, edges = get_nodes_and_edges(params)
-    chunk_size = (t_stop - t_start) * sampling_rate
-    padding = (t_start * sampling_rate, t_start * sampling_rate)
+    chunk_size = np.int64((t_stop - t_start) * sampling_rate)
+    padding = (np.int64(t_start * sampling_rate), np.int64(t_start * sampling_rate))
 
     if do_spatial_whitening:
         spatial_whitening = load_data(params, 'spatial_whitening')
@@ -1257,7 +1257,7 @@ def view_peaks(file_name, t_start=0, t_stop=1, n_elec=2, square=True, xzoom=None
     peaks      = {}
     
     if do_spatial_whitening:
-        data = numpy.dot(data, spatial_whitening)
+        data = numpy.dot(data[0], spatial_whitening)
     if do_temporal_whitening: 
         data = scipy.ndimage.filters.convolve1d(data, temporal_whitening, axis=0, mode='constant')
     
@@ -1271,7 +1271,7 @@ def view_peaks(file_name, t_start=0, t_stop=1, n_elec=2, square=True, xzoom=None
             idx = numpy.random.permutation(numpy.arange(N_e))[:n_elec]
     else:
         idx = n_elec
-        n_elec = numpy.sqrt(len(idx))
+        n_elec = len(idx)
     pylab.figure()
     for count, i in enumerate(idx):
         if square:

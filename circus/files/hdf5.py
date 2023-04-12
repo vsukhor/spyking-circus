@@ -40,7 +40,7 @@ class H5File(DataFile):
     def __check_valid_key__(self, key):
         file = h5py.File(self.file_name, mode='r')
         all_fields = []
-        file.visit(all_fields.append)    
+        file.visit(all_fields.append)
         if key not in all_fields:
             print_and_log([
                 "The key %s can not be found in the dataset! Keys found are:" % key,
@@ -147,7 +147,7 @@ class H5File(DataFile):
     def write_chunk(self, time, data):
 
         data = self._unscale_data_from_float32(data)
-        
+
         if self.time_axis == 0:
             if not self.grid_ids:
                 self.data[time:time+data.shape[0], :] = data
@@ -166,7 +166,7 @@ class H5File(DataFile):
             self.my_file = h5py.File(self.file_name, mode=mode)
 
         self.data = self.my_file.get(self.h5_key)
-        
+
     def _close(self):
         self.my_file.close()
         try:
@@ -176,4 +176,4 @@ class H5File(DataFile):
 
     @property
     def h5_key(self):
-        return self.params['h5_key']
+        return self.params['h5_key'][1:-1]
