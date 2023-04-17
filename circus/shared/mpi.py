@@ -52,7 +52,7 @@ def check_if_cluster():
 def check_valid_path(path):
 
     data = numpy.array([os.path.exists(path)], dtype='int32')
-    res = all_gather_array(data, comm, dtype='int32').astype(numpy.bool)
+    res = all_gather_array(data, comm, dtype='int32').astype(bool)
     return numpy.all(res)
 
 
@@ -90,11 +90,11 @@ def detect_memory(params, whitening=False, filtering=False, fitting=False):
         max_size = int(30*data_file.sampling_rate)
     elif fitting:
         max_size = int(0.1*data_file.sampling_rate)
-    else:       
+    else:
         max_size = (data_file.duration//comm.size)
 
     chunk_size = min(max_memory, max_size)
-    
+
     if comm.rank == 0:
         print_and_log(['Setting data chunk size to %g second' % (chunk_size/float(sampling_rate))], 'debug', logger)
 
